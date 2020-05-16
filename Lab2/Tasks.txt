@@ -1,0 +1,371 @@
+1. CREATE DATABASE Hobby;
+   CREATE USER 'VALERII89'@'localhost' IDENTIFIED BY '983642';
+   GRANT SELECT, UPDATE, INSERT ON Hobby.* TO 'VALERII89'@'localhost';
+   FLUSH PRIVILEGES;
+
+2. USE Hobby;
+
+  -CREATE TABLE osoba (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    imię VARCHAR(20) NOT NULL,
+    dataUrodzenia DATE NOT NULL,
+    plec CHAR(1) NOT NULL
+    );
+	
+	  -DELIMITER $$
+	   CREATE TRIGGER age_check BEFORE INSERT ON osoba
+	   FOR EACH ROW
+	   BEGIN 
+	   IF (YEAR(CURDATE())-YEAR(NEW.dataUrodzenia)) < 18 THEN 
+	   SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Ivalid state!';
+	   END IF;
+	   END$$
+	   DELIMITER ;
+
+
+   -CREATE TABLE sport (
+   	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   	nazwa VARCHAR(20) NOT NULL,
+   	typ ENUM('indywidualny','druЕјynowy','mieszany') DEFAULT 'druЕјynowy',
+   	lokacja VARCHAR(20)
+    );
+
+
+   -CREATE TABLE nauka (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nazwa VARCHAR(20) NOT NULL,
+    lokacja VARCHAR(20)    
+    );
+
+
+   -CREATE TABLE inne (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nazwa VARCHAR(20) NOT NULL,
+    lokacja VARCHAR(20),
+    towarzysze BOOL DEFAULT true
+    );
+
+
+   -CREATE TABLE hobby (
+    osoba INT NOT NULL,
+    id INT,
+    typ ENUM('sport','nauka','inne') NOT NULL,
+    PRIMARY KEY (osoba,id,typ)
+    ) ENGINE=MyISAM;
+
+
+3. -CREATE TABLE zwierzak (
+    name VARCHAR(20),
+    owner VARCHAR(20),
+    species VARCHAR(20),
+    sex CHAR(1),
+    birth DATE
+    );
+
+   -INSERT INTO osoba(imię, dataUrodzenia, plec)   
+    SELECT DISTINCT 
+    owner, 
+    '2000-01-01', 
+    'm'  
+    FROM zwierzak   
+    WHERE owner NOT IN(SELECT imię FROM osoba);
+
+   -INSERT INTO Hobby.zwierzak SELECT * FROM menagerie.pet;
+
+   -UPDATE osoba SET dataUrodzenia = (DATE(DATE_SUB(NOW(),  INTERVAL 18 YEAR) - INTERVAL RAND()*365*20 DAY));
+
+   -UPDATE osoba SET plec = (CASE WHEN FLOOR(RAND()*2) = 1 THEN 'm' ELSE 'f' END);
+
+
+4. -ALTER TABLE osoba ADD nazwisko VARCHAR(50) AFTER imię;
+
+   -ALTER TABLE zwierzak ADD id INT FIRST;
+
+   -UPDATE zwierzak SET id = (SELECT id FROM osoba WHERE
+    zwierzak.owner=osoba.imię);
+
+   -ALTER TABLE zwierzak DROP COLUMN owner;
+
+5. -ALTER TABLE zwierzak ADD FOREIGN KEY (id) REFERENCES osoba(id);
+
+   -ALTER TABLE hobby ADD FOREIGN KEY (osoba) REFERENCES osoba(id);
+
+6. -ALTER TABLE inne AUTO_INCREMENT = 7000;
+
+7. -DELIMITER $$
+    CREATE FUNCTION generate_imie () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (100-1))), "James","Mary","John","Patricia",
+        "Robert","Linda","Michael","Barbara","William","Elizabeth","David",
+        "Jennifer","Richard","Maria","Charles","Susan","Joseph","Margaret","Thomas",
+        "Dorothy","Christopher","Lisa","Daniel","Nancy","Paul","Karen","Mark","Betty",
+        "Donald","Helen","George","Sandra","Kenneth","Donna","Steven","Carol","Edward",
+        "Ruth","Brian","Sharon","Ronald","Michelle","Anthony","Laura","Kevin","Sarah",
+        "Jason","Kimberly","Matthew","Deborah","Gary","Jessica","Timothy","Shirley","Jose",
+        "Cynthia","Larry","Angela","Jeffrey","Melissa","Frank","Brenda","Scott","Amy","Eric",
+        "Anna","Stephen","Rebecca","Andrew","Virginia","Raymond","Kathleen","Gregory","Pamela",
+        "Joshua","Martha","Jerry","Debra","Dennis","Amanda","Walter","Stephanie","Patrick","Carolyn",
+        "Peter","Christine","Harold","Marie","Douglas","Janet","Henry","Catherine","Carl","Frances",
+        "Arthur","Ann","Ryan","Joyce","Roger","Diane");
+    END$$
+
+
+   -DELIMITER $$
+    CREATE FUNCTION generate_nazwisko () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (100-1))), "Smith","Johnson","Williams","Jones","Brown",
+        "Davis","Miller","Wilson","Moore","Taylor","Anderson","Thomas","Jackson","White","Harris",
+        "Martin","Thompson","Garcia","Martinez","Robinson","Clark","Rodriguez","Lewis","Lee","Walker",
+        "Hall","Allen","Young","Hernandez","King","Wright","Lopez","Hill","Scott","Green","Adams","Baker",
+        "Gonzalez","Nelson","Carter","Mitchell","Perez","Roberts","Turner","Phillips","Campbell","Parker","Evans",
+        "Edwards","Collins","Stewart","Sanchez","Morris","Rogers","Reed","Cook","Morgan","Bell","Murphy","Bailey",
+        "Rivera","Cooper","Richardson","Cox","Howard","Ward","Torres","Peterson","Gray","Ramirez","James","Watson",
+        "Brooks","Kelly","Sanders","Price","Bennett","Wood","Barnes","Ross","Henderson","Coleman","Jenkins","Perry",
+        "Powell","Long","Patterson","Hughes","Flores","Washington","Butler","Simmons","Foster","Gonzales","Bryant",
+        "Alexander","Russell","Griffin","Diaz","Hayes");
+    END$$
+
+
+   -DELIMITER $$
+    CREATE FUNCTION generate_sport () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (58-1))), "Buzkashi",
+        "Barrel racing","Campdrafting","Cirit","Charreada",
+        "Chilean rodeo","Chuckwagon racing","Cross country",
+        "Cutting","Dressage","Endurance riding","English pleasure",
+        "Equitation","Eventing","Equestrian vaulting","Gymkhana",
+        "Harness racing","Hobby horse polo","Horse racing",
+        "Horse polo, or polo","Horseball","Hunter","Hunter-jumpers",
+        "Jousting","Mounted games","Pato","Pleasure driving",
+        "Reining","Rodeo","Show jumping","Steeplechase","Sur-papakh","Team penning",
+        "Tent pegging","Western pleasure","Axe throwing",
+        "Boffer fighting","Canne de combat","Cardboard Tube Fighting",
+        "Eskrima","Egyptian stick fencing","Fencing","Gatka","Jogo do pau",
+        "Jittejutsu","Kendo","Kenjutsu","Krabi–krabong","Kung fu","Medieval MMA","Modern Arnis","Naginatajutsu",
+        "Nguni stick-fighting","Shurikenjutsu","Silambam","Sword fighting","Wushu","Kumdo","Wing Chun");
+    END$$
+
+   -DELIMITER $$
+    CREATE FUNCTION generate_nauka () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (100-1))),  "acarology",
+        "accidence","aceology","acology","acoustics","adenology",	
+        "aedoeology","aerobiology","aerodonetics","aerodynamics",	
+        "aerolithology","aerology","aeronautics","aerophilately",	
+        "aerostatics","agonistics","agriology","agrobiology",	
+        "agrology","agronomics","agrostology","alethiology",
+        "algedonics","algology","anaesthesiology","anaglyptics",
+        "anagraphy","anatomy","andragogy","anemology","angelology",	
+        "angiology","anthropobiology","anthropology","aphnology",	
+        "apiology","arachnology","archaeology","archelogy",	"archology",	
+        "arctophily","areology","aretaics","aristology","arthrology",	
+        "astacology","astheniology","astrogeology","astrology",	
+        "astrometeorology","astronomy","astrophysics","astroseismology",
+        "atmology","audiology","autecology","autology","auxology",	
+        "avionics","axiology","bacteriology","balneology","barodynamics",	
+        "barology","batology","bibliology","bibliotics","bioecology",	
+        "biology","biometrics",	"bionomics","botany","bromatology",	
+        "brontology","bryology","cacogenics","caliology","calorifics",	
+        "cambistry","campanology","carcinology","cardiology","caricology",	
+        "carpology","cartography","cartophily","castrametation","catacoustics",
+        "catalactics","catechectics","cetology","chalcography","chalcotriptics",	
+        "chaology","characterology","chemistry","chirocosmetics","chirography",	
+        "chirology","chiropody","chorology","chrematistics","chronobiology",	
+        "chrysology","ciselure","climatology","clinology","codicology",	
+        "coleopterology","cometology","conchology");
+    END$$
+
+   -DELIMITER $$
+    CREATE FUNCTION generate_inne () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (40-1))),  "Architecture",
+        "Astronomy","Biology","Chemistry","Economics", "Electronics", 
+        "Engineering", "English","History","Life Sciences","Literature Club",
+        "Literary Magazine","Math Club","Peer Tutoring","Poetry Club",
+        "Physics Club","Psychology", "Quill and Scroll","Robotics Club",
+        "Writing Club","EconChallenge","Educators Rising","Math League",
+        "Quiz Bowl","Science Bowl","Science Olympiad","Animation","Anime/Manga",
+        "Art Club","Blacksmithing","Cartooning","Ceramics","Drama Club","Fashion design",
+        "Graphic Design","Jewelry Making","Photography","Sculpture","Sewing","Weaving",
+        "Woodworking","Ensembles","Jazz Band","Orchestra","Solo music");
+    END$$
+
+    drop function generate_lokacja;
+    DELIMITER $$
+    CREATE FUNCTION generate_lokacja () RETURNS varchar(255)
+    BEGIN
+        RETURN ELT(FLOOR(1 + (RAND() * (100-1))),  "Alchevsk","Bila Tserkva","Berdyansk","Cherkasy","Chernihiv",
+    "Chernivtsi","Dnipro","Donetsk", "Yevpatoria","Horlivka",
+    "Ivano-Frankivsk","Kamianets-Podilskyi","Kamianske","Kerch",
+    "Kharkiv","Kherson","Khmelnytskyi","Kiev","Kramatorsk",
+    "Kremenchuk","Kropyvnytskyi","Kryvyi Rih","Luhansk","Lutsk"
+    "Lviv","Lysychansk","Makiivka","Mariupol","Melitopol","Mykolaiv",
+    "Nikopol","Odessa","Pavlohrad","Poltava","Rivne","Sevastopol","Sievierodonetsk",
+    "Simferopol","Sloviansk","Sumy","Ternopil","Uzhhorod","Vinnytsia","Zaporizhia",
+    "Zhytomyr","Aberdeen","Basildon","Belfast","Birmingham","Blackburn","Blackpool",
+    "Bolton","Bournemouth","Bradford","Brighton", "Bristol","Cambridge",
+    "Cardiff","Chelmsford","Cheltenham","Colchester","Coventry","Crawley",
+    "Darlington","Derby","Doncaster","Dundee","Edinburgh","Exeter",
+    "Gateshead","Glasgow","Gloucester","High Wycombe","Huddersfield",
+    "Ipswich","Kingston upon Hull","Leeds","Leicester","Liverpool",
+    "London","Luton","Maidstone","Manchester","Middlesbrough","Milton Keynes","Newcastle upon Tyne",
+    "Newport","Northampton","Norwich","Nottingham","Oldham","Oxford","Peterborough","Plymouth",
+    "Poole","Portsmouth","Preston","Reading","Rotherham","Rochdale","Salford","Sale, Greater Manchester",
+    "Sheffield","Slough","Solihull","Southampton","Southend-on-Sea","St Helens","Stockport",
+    "Stoke-on-Trent","Sunderland","Swansea","Swindon","Telford","Warrington",
+    "Watford","West Bromwich","Wigan","Wolverhampton","Worcester","York");
+    END$$
+
+
+
+ 7.-CREATE PROCEDURE add_record(IN nameTable VARCHAR(20), IN numRecord INT) 
+    BEGIN 
+        DECLARE i INT; 
+        SET i = 1; 
+        loop_main: LOOP 
+            IF nameTable = 'osoba' 
+            THEN 
+                INSERT INTO osoba (imię,nazwisko,dataUrodzenia,plec) VALUES ((SELECT generate_imie()),(SELECT generate_nazwisko()),(DATE(DATE_SUB(NOW(), INTERVAL 18 YEAR)-INTERVAL RAND()*365*20 DAY)),
+                (SELECT plec FROM osoba z ORDER BY RAND() LIMIT 1)); 
+            END IF; 
+            IF nameTable = 'sport'
+            THEN
+                INSERT INTO sport (nazwa,typ) VALUES ((SELECT generate_sport()), (SELECT typ FROM sport y ORDER BY RAND() LIMIT 1)); 
+            END IF;
+            IF nameTable = 'nauka'
+            THEN
+                INSERT INTO nauka (nazwa) VALUES ((SELECT generate_nauka())); 
+            END IF;
+            IF nameTable = 'inne'
+            THEN
+                INSERT INTO inne (nazwa,towarzysze) VALUES ((SELECT generate_inne()),(SELECT towarzysze FROM inne x ORDER BY RAND() LIMIT 1)); 
+            END IF;
+            IF nameTable = 'hobby'
+            THEN
+                SET @x = (CASE 
+                            WHEN FLOOR(RAND()*3)=1 THEN 1 
+                            WHEN FLOOR(RAND()*3)=2 THEN 2
+                            ELSE 3 
+                            END); 
+                
+                INSERT INTO hobby (osoba,id,typ) VALUES ((SELECT id FROM osoba ORDER BY RAND() LIMIT 1), 
+                (CASE 
+                    WHEN @x = 1 THEN (SELECT distinct id FROM sport ORDER BY RAND() LIMIT 1)
+                    WHEN @x = 2 THEN (SELECT distinct id FROM nauka ORDER BY RAND() LIMIT 1)
+                    ELSE (SELECT distinct id FROM inne ORDER BY RAND() LIMIT 1)
+                    END),
+                (@x));
+            END IF;
+            IF i < numRecord 
+            THEN 
+                SET i = i + 1;
+                ITERATE loop_main; 
+            ELSE LEAVE loop_main; 
+            END IF; 
+        END LOOP loop_main; 
+    END$$
+
+8. -SET @foo = 'SELECT (CASE WHEN h.typ = 1 THEN s.nazwa WHEN h.typ = 2 THEN n.nazwa WHEN h.typ = 3 THEN i.nazwa END) AS nazwa 
+                    FROM hobby h LEFT JOIN sport s ON h.id = s.id LEFT JOIN nauka n ON h.id = n.id LEFT JOIN inne i ON h.id = i.id  WHERE h.osoba = ? AND h.typ = ?';
+
+    PREPARE stmtListaHobby FROM @foo;
+    SET @id = 1306;
+    SET @typ = 1;
+    EXECUTE stmtListaHobby USING @id, @typ;
+    DEALLOCATE PREPARE stmtListaHobby;
+
+9. -DELIMITER $$
+    CREATE PROCEDURE all_hobby(IN osobaID INT)
+    BEGIN
+        SET @foo = 'SELECT (CASE WHEN h.typ = 1 THEN s.nazwa WHEN h.typ = 2 THEN n.nazwa WHEN h.typ = 3 THEN i.nazwa END)AS nazwa FROM hobby h LEFT JOIN sport s ON h.id = s.id LEFT JOIN nauka n ON h.id = n.id LEFT JOIN inne i ON h.id = i.id WHERE h.osoba = ?';
+        PREPARE stmtListaHobby FROM @foo;
+        SET @id = osobaID;
+        EXECUTE stmtListaHobby USING @id;
+        DEALLOCATE PREPARE stmtListaHobby;
+    END$$
+
+10.-DELIMITER $$
+    CREATE PROCEDURE all_hobby(IN osobaID INT)
+    BEGIN
+        SET @foo = 'SELECT (CASE WHEN h.typ = 1 THEN s.nazwa WHEN h.typ = 2 THEN n.nazwa WHEN h.typ = 3 THEN i.nazwa END) AS nazwa FROM hobby h LEFT JOIN sport s ON h.id = s.id LEFT JOIN nauka n ON h.id = n.id LEFT JOIN inne i ON h.id = i.id WHERE h.osoba = ? UNION SELECT DISTINCT species FROM zwierzak z INNER JOIN osoba o ON z.id=o.id WHERE o.id = ?';
+        PREPARE stmtListaHobby FROM @foo;
+        SET @id = osobaID;
+        SET @id = osobaID;
+        EXECUTE stmtListaHobby USING @id, @id1;
+        DEALLOCATE PREPARE stmtListaHobby;
+    END$$
+
+11.-DELIMITER $$
+    CREATE TRIGGER hobby_adder AFTER INSERT ON hobby
+    FOR EACH ROW
+    BEGIN 
+        IF NEW.typ = 'sport' THEN
+            INSERT INTO sport (id,nazwa,typ) VALUES ((NEW.id),(SELECT generate_sport()), (SELECT typ FROM sport y ORDER BY RAND() LIMIT 1));
+        END IF;
+        IF NEW.typ = 'nauka' THEN 
+            INSERT INTO nauka (id,nazwa) VALUES ((NEW.id),(SELECT generate_nauka()));
+        END IF;
+        IF NEW.typ = 'inne' THEN 
+            INSERT INTO inne (id,nazwa,towarzysze) VALUES ((NEW.id),(SELECT generate_inne()),(SELECT towarzysze FROM inne x ORDER BY RAND() LIMIT 1));
+        END IF;
+    END$$
+    DELIMITER ;
+
+12.-DELIMITER $$
+    CREATE TRIGGER sport_delete AFTER DELETE ON sport
+    FOR EACH ROW
+    BEGIN
+        DELETE FROM hobby WHERE id = old.id;
+    END$$
+    DELIMITER;
+
+13.-DELIMITER $$
+    CREATE TRIGGER nauka_modify AFTER UPDATE ON nauka
+    FOR EACH ROW 
+    BEGIN
+        IF old.id <> new.id THEN
+            UPDATE hobby SET id = new.id WHERE id = old.id AND typ = 'nauka';
+        END IF;
+    END$$
+
+   -DELIMITER $$
+    CREATE TRIGGER nauka_delete AFTER DELETE ON nauka
+    FOR EACH ROW
+    BEGIN
+        DELETE FROM hobby WHERE id = old.id;
+    END$$
+    DELIMITER;
+
+14.-DELIMITER $$
+    CREATE TRIGGER delete_osoba AFTER DELETE ON osoba
+    FOR EACH ROW 
+    BEGIN
+        DELETE FROM hobby WHERE osoba = old.id;
+        UPDATE zwierzak SET id = (SELECT id FROM osoba ORDER BY RAND() LIMIT 1) WHERE id = old.id; 
+    END$$
+
+        DELETE FROM sport WHERE id IN (SELECT h.id FROM hobby h JOIN osoba o ON h.id=o.id WHERE h.osoba = old.id AND h.typ = 'sport');
+        DELETE FROM nauka WHERE id IN (SELECT h.id FROM hobby h JOIN osoba o ON h.id=o.id WHERE h.osoba = old.id AND h.typ = 'nauka');
+        DELETE FROM inne WHERE id IN (SELECT h.id FROM hobby h JOIN osoba o ON h.id=o.id WHERE h.osoba = old.id AND h.typ = 'inne'); 
+
+15.
+
+16.-DELIMITER $$
+    CREATE VIEW hobbyInfo 
+        AS (SELECT s.id, s.nazwa, COUNT(s.id) FROM sport s JOIN hobby h ON s.id=h.id group by h.id)
+           UNION
+           (SELECT n.id, n.nazwa, COUNT(n.id) FROM nauka n JOIN hobby h ON n.id=h.id group by h.id)
+           UNION
+           (SELECT i.id, i.nazwa, COUNT(i.id) FROM inne i JOIN hobby h ON i.id=h.id group by h.id);
+    END$$
+
+17.-DELIMITER $$
+    CREATE VIEW hobby_zwierzInfo
+        AS SELECT o.id,o.imię,o.nazwisko,o.dataUrodzenia,o.plec,(z.name) as zwierzak,(s.nazwa) as sport,(n.nazwa) as nauka,(i.nazwa) as inne FROM hobby h LEFT JOIN osoba o on h.osoba=o.id LEFT JOIN zwierzak z on o.id=z.id LEFT JOIN sport s on h.id=s.id LEFT JOIN nauka n on h.id=n.id LEFT JOIN inne i on h.id=i.id;
+    END$$
+
+18.-DELIMITER $$
+    CREATE PROCEDURE max_ageHobby()
+    BEGIN
+        SELECT o.imię, o.dataUrodzenia FROM osoba o JOIN hobby h ON h.osoba=o.id GROUP BY h.osoba ORDER BY COUNT(*) DESC LIMIT 1;
+    END$$
