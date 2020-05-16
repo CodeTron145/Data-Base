@@ -1,0 +1,1 @@
+SELECT distinct owner FROM pet WHERE name LIKE '%ffy';

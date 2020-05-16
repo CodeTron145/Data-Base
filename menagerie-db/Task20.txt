@@ -1,0 +1,1 @@
+SELECT owner, COUNT(owner) FROM pet GROUP BY owner ORDER BY COUNT(owner) DESC;

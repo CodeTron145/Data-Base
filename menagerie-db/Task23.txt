@@ -1,0 +1,14 @@
+INSERT INTO pet VALUES('Joana', 'Vlad', 'dog', 'f', '1996-09-19');
+INSERT INTO pet VALUES('Dolly', 'Piotr', 'sheep', 'f', '1995-08-18');
+INSERT INTO pet VALUES('Shelly', 'Oksana', 'goat', 'f', '1994-07-17');
+INSERT INTO pet VALUES('Maks', 'Oksana', 'hamster', 'm', '1992-06-16');
+INSERT INTO pet VALUES('Molly', 'Piotr', 'goat', 'f', '1999-05-15');
+INSERT INTO pet VALUES('Polly', 'Vlad', 'goat', 'f', '1998-04-14');
+INSERT INTO pet VALUES('Bik', 'Piotr', 'dog', 'm', '1991-02-13');
+INSERT INTO event VALUES('Joana', '1996-09-19', 'Vlad', 'birthday', 'First birthday');
+INSERT INTO event VALUES('Dolly', '1997-02-03', 'Piotr', 'litter', '2 toy');
+INSERT INTO event VALUES('Shelly', '1997-03-06', 'Oksana', 'litter', '3 toy');
+INSERT INTO event VALUES('Maks', '1993-05-10', 'Oksana', 'vet', 'Broken leg');
+INSERT INTO event VALUES('Molly', '1999-08-10', 'Piotr', 'vet', 'Broken tail');
+INSERT INTO event VALUES('Polly', '1999-04-14', 'Vlad', 'birthday', 'Gave her a present');
+INSERT INTO event VALUES('Bik', '1991-02-04', 'Piotr', 'birthday', 'First birthday');

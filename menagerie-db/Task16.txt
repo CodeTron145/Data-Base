@@ -1,0 +1,1 @@
+SELECT s1.owner, s2.owner FROM pet AS s1 JOIN pet AS s2 ON s1.species=s2.species AND s1.owner < s2.owner;

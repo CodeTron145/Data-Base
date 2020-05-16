@@ -1,0 +1,1 @@
+SELECT name, species FROM pet WHERE birth = (SELECT MAX(birth) FROM pet);

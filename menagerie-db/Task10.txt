@@ -1,0 +1,1 @@
+SELECT event.name, pet.owner FROM event INNER JOIN pet ON event.name = pet.name WHERE type = 'birthday' AND pet.species LIKE 'dog' ORDER BY pet.name DESC;

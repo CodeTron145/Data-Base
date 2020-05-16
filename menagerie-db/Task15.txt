@@ -1,0 +1,1 @@
+SELECT owner FROM pet WHERE NOT name IN (SELECT name FROM event WHERE type = 'birthday') ORDER BY birth;

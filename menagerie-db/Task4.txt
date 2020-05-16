@@ -1,0 +1,1 @@
+SELECT name, owner FROM pet WHERE species = 'dog' AND MONTH(birth) < 7;

@@ -1,0 +1,1 @@
+SELECT DISTINCT pet.owner FROM event INNER JOIN pet ON event.name = pet.name WHERE date > DATE('1997-08-03');

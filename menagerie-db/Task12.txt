@@ -1,0 +1,1 @@
+SELECT name, species FROM pet WHERE death IS NULL AND birth ORDER BY birth LIMIT 2;
