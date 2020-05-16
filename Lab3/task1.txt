@@ -1,0 +1,265 @@
+1. -CREATE INDEX name_index USING BTREE ON osoba(imie);
+    
+   -CREATE INDEX birthday_index USING BTREE ON osoba(dataUrodzenia);
+
+   -CREATE UNIQUE INDEX nazwa_id_index USING BTREE ON sport(id,nazwa);
+   
+   -CREATE UNIQUE INDEX id_nazwa_index USING BTREE ON inne(nazwa,id);
+   
+   -CREATE UNIQUE INDEX osoba_id_typ_index USING BTREE ON hobby(osoba,id,typ);
+
+
+2. -EXPLAIN SELECT plec FROM  osoba WHERE imie LIKE "A%";
+    
+   -SELECT DISTINCT nazwa FROM sport ORDER BY nazwa;
+   
+   -SELECT s1.nazwa, s2.nazwa FROM sport s1 JOIN sport s2 ON s1.lokacja=s2.lokacja WHERE s1.typ='indywidualny' AND s2.typ='indywidualny';
+    
+   -SELECT imie FROM osoba WHERE dataUrodzenia < "2000-01-01";
+    
+   -SELECT T.name FROM (SELECT CONCAT_WS("",inne.nazwa,sport.nazwa,nauka.nazwa) AS name  FROM 
+    (((hobby LEFT JOIN inne ON hobby.id=inne.id) LEFT JOIN sport ON hobby.id=sport.id) LEFT JOIN nauka ON hobby.id=nauka.id)) AS T GROUP BY name ORDER BY COUNT(*) DESC LIMIT 1;
+   
+   -SELECT imię FROM osoba o JOIN zwierzak z ON z.id = o.id && species = "dog" ORDER BY dataUrodzenia LIMIT 1;
+
+
+3. -CREATE TABLE zawody(
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    nazwa VARCHAR(20) NOT NULL,
+    pensja_min INT NOT NULL,
+    pensja_max INT NOT NULL);
+
+   -DELIMITER $$
+    CREATE TRIGGER payment_fork BEFORE INSERT ON zawody
+    FOR EACH ROW
+    BEGIN
+    IF(NEW.pensja_min>NEW.pensja_max||NEW.pensja_min<=0)
+    THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID PAYMENT';
+        END IF;
+    END $$   
+    DELIMITER ;
+
+   -DELIMITER $$
+    CREATE TRIGGER payment_fork_up BEFORE UPDATE ON zawody
+    FOR EACH ROW
+    BEGIN
+    IF(NEW.pensja_min>NEW.pensja_max||NEW.pensja_min<=0)
+    THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID PAYMENT';
+        END IF;
+    END $$   
+    DELIMITER ;
+
+   -CREATE TABLE praca(
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    id_zawod INT NOT NULL,
+    id_osoba INT NOT NULL,
+    placa INT NOT NULL);
+
+   -DELIMITER $$
+    CREATE TRIGGER work BEFORE INSERT ON praca
+    FOR EACH ROW
+    BEGIN
+        IF(
+        (NOT EXISTS (SELECT * FROM osoba WHERE osoba.id = NEW.id_osoba))||
+        (NOT EXISTS (SELECT pensja_max FROM zawody WHERE zawody.id = NEW.id_zawod))||
+        (NEW.placa>=(SELECT pensja_max FROM zawody WHERE zawody.id = NEW.id_zawod))||
+        (NEW.placa<=(SELECT pensja_min FROM zawody WHERE zawody.id = NEW.id_zawod)))
+        THEN
+            SIGNAL SQLSTATE '45000'SET MESSAGE_TEXT = 'INVALID PAYMENT';
+            END IF;
+    END $$   
+    DELIMITER ;
+
+   -DELIMITER $$
+    CREATE TRIGGER work_up BEFORE UPDATE ON praca
+    FOR EACH ROW
+    BEGIN
+        IF(
+        (NOT EXISTS (SELECT * FROM osoba WHERE osoba.id = NEW.id_osoba))||
+        (NOT EXISTS (SELECT pensja_max FROM zawody WHERE zawody.id = NEW.id_zawod))||
+        (NEW.placa>=(SELECT pensja_max FROM zawody WHERE zawody.id = NEW.id_zawod))||
+        (NEW.placa<=(SELECT pensja_min FROM zawody WHERE zawody.id = NEW.id_zawod)))
+        THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'INVALID PAYMENT';
+        END IF;
+    END $$   
+    DELIMITER ;
+
+   -DROP PROCEDURE IF EXISTS create_profession;
+    DELIMITER $$
+    CREATE PROCEDURE create_profession()
+    BEGIN
+        SET @i = 0;
+        WHILE @i < 10 DO
+            SET @sal = RAND()*10000;
+            INSERT INTO zawody (nazwa,pensja_max,pensja_min) VALUES (CONCAT("Profession",@i),@sal,@sal*RAND());
+            SET @i = @i+1;
+        END WHILE;
+        END $$
+    DELIMITER ;
+    CALL create_profession;
+
+   -DELIMITER $$
+    CREATE PROCEDURE create_jobs()
+    BEGIN
+        DECLARE id_osoby INT;
+        DECLARE max INT;
+        DECLARE min INT;
+        DECLARE id_zawod1 INT;
+        DECLARE not_done BOOLEAN DEFAULT TRUE;
+        DECLARE cur1 CURSOR FOR SELECT id FROM osoba;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET not_done=FALSE;
+        OPEN cur1;
+        WHILE not_done DO
+            FETCH cur1 INTO id_osoby;
+            SET id_zawod1 = 1+RAND()*9;
+            SET max = (SELECT pensja_max FROM zawody WHERE zawody.id = id_zawod1);
+            SET min = (SELECT pensja_min FROM zawody WHERE zawody.id = id_zawod1);
+            INSERT INTO praca (id_zawod,id_osoba,placa) VALUES (id_zawod1,id_osoby,min+RAND()*(max-min-1));
+        END WHILE;
+    END $$
+    DELIMITER ;
+    CALL create_jobs;
+
+
+4. -DELIMITER $$
+    CREATE PROCEDURE segregator(IN kol CHAR(20),IN agg CHAR(20) ,OUT X LONGTEXT)
+    BEGIN
+
+        IF agg = 'COUNT' THEN
+            SET @QUERRY = CONCAT("SET @TEMP = (SELECT ",agg,"(",kol,")"," FROM osoba)");
+            PREPARE q FROM @QUERRY;
+            EXECUTE q ;
+            DEALLOCATE PREPARE q;
+            SET X = @TEMP;
+        ELSEIF agg = 'GROUP_CONCAT' && kol != 'id' THEN
+            SET @QUERRY = CONCAT("SET @TEMP = (SELECT ",agg,"(",kol,")"," FROM osoba)");
+            PREPARE q FROM @QUERRY;
+            EXECUTE q ;
+            DEALLOCATE PREPARE q;
+            SET X = @TEMP;
+        ELSEIF kol = 'id' && agg = 'GROUP_CONCAT' THEN
+             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You cant select id!';
+        ELSEIF agg = 'MIN' THEN
+            SET @QUERRY = CONCAT("SET @TEMP = (SELECT ",agg,"(",kol,")"," FROM osoba)");
+            PREPARE q FROM @QUERRY;
+            EXECUTE q ;
+            DEALLOCATE PREPARE q;
+            SET X = @TEMP;
+        ELSEIF agg = 'MAX' THEN
+            SET @QUERRY = CONCAT("SET @TEMP = (SELECT ",agg,"(",kol,")"," FROM osoba)");
+            PREPARE q FROM @QUERRY;
+            EXECUTE q ;
+            DEALLOCATE PREPARE q;
+            SET X = @TEMP;
+        ELSEIF agg = 'AVG' || agg = 'STD' || agg = 'VAR_POP' THEN
+            SET @QUERRY = CONCAT("SET @TEMP = (SELECT ",agg,"(YEAR(NOW()) - YEAR(",kol,"))","FROM osoba)");
+            PREPARE q FROM @QUERRY;
+            EXECUTE q ;
+            DEALLOCATE PREPARE q;
+            SET X = @TEMP;
+        ELSE
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Incorrect parameters! Try again!';
+        END IF; 
+    END$$
+    DELIMITER ;
+ 
+5. -CREATE TABLE haslo (
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    id_osoby INT UNIQUE NOT NULL,
+    haslo_hash VARCHAR(200) NOT NULL); 
+
+    DELIMITER $$
+    CREATE PROCEDURE birth(IN id INT,IN haslo CHAR(20), OUT dataUrodzenia DATE)
+    BEGIN
+        IF md5(haslo) = (SELECT haslo_hash FROM haslo WHERE haslo.id_osoby = id) THEN
+            SELECT dataUrodzenia FROM osoba WHERE dataUrodzenia = (SELECT osoba.dataUrodzenia FROM osoba WHERE osoba.id = id);
+        ELSE
+            SET dataUrodzenia =(DATE(DATE_SUB(NOW(),  INTERVAL 18 YEAR) - INTERVAL RAND()*365*99 DAY));
+        END IF;
+    END $$
+    DELIMITER ;
+
+7. -WITH RECURSIVE cte(NPK,n,k,i) AS
+    (
+    SELECT  1 AS NPK, 0 AS n, 0 AS k
+        UNION DISTINCT
+    SELECT   1,n + 1,0 FROM cte WHERE n <= 9
+        UNION DISTINCT
+    SELECT  1,n+1,n+1 FROM cte WHERE n <= 9
+        UNION DISTINCT
+    SELECT  ((NPK*(n-k+(i+1)))/i),n,k FROM cte WHERE n<=9 && n>=5 && n <> 6 && k>=2 && k<=5 && i<=k
+    )
+    SELECT * FROM cte;
+
+
+8. -DELIMITER $$
+    CREATE PROCEDURE salary_up (IN profession CHAR(20))
+    BEGIN
+        DECLARE id_pracy INT;
+        DECLARE not_done BOOLEAN DEFAULT TRUE;
+        DECLARE cur1 CURSOR FOR SELECT praca.id FROM praca WHERE praca.id_zawod = (SELECT zawody.id FROM zawody WHERE zawody.nazwa = profession);
+
+        DECLARE continue HANDLER FOR NOT FOUND SET not_done=FALSE;
+
+        OPEN cur1;
+        SET autocommit = 0;
+        START TRANSACTION;
+            WHILE not_done DO
+                fetch cur1 into id_pracy;
+                UPDATE praca SET praca.placa = praca.placa*1.1 WHERE id = id_pracy;
+            END WHILE;
+        COMMIT;
+    END $$
+    DELIMITER ;
+
+
+9. -DELIMITER $$
+    CREATE FUNCTION gauss(mean float, stdev float) RETURNS float
+    BEGIN
+        set @x=rand(), @y=rand();
+        set @gaus = ((sqrt(-2*log(@x))*cos(2*pi()*@y))*stdev)+mean;
+        return @gaus;
+    END $$
+    DELIMITER ;
+
+    
+   -DELIMITER $$
+    CREATE PROCEDURE privacy (IN profession CHAR(20),OUT avg_pay FLOAT)
+    BEGIN
+        DECLARE randd FLOAT;
+        DECLARE delta INT;
+
+        SET delta = (SELECT (MAX(tab.placa)-MIN(tab.placa))/COUNT(*) FROM (SELECT praca.placa FROM praca WHERE praca.id_zawod =(SELECT zawody.id FROM zawody WHERE zawody.nazwa = profession) )AS tab );
+        
+        SET randd = gauss(0,delta/0.03);
+        SET avg_pay = (SELECT AVG(praca.placa)+randd FROM praca WHERE praca.id_zawod =(SELECT zawody.id FROM zawody WHERE zawody.nazwa = profession) );
+    END $$
+    DELIMITER ;
+
+10. -mysqldump -u root -p Hobby > Hobby.sql
+    -DROP DATABASE Hobby;
+    -mysql -u root -p Hobby < Hobby.sql 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
