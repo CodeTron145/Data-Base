@@ -1,0 +1,62 @@
+[
+  {
+    "index": 0,
+    "nazwa": "Archery",
+    "lokacja": ["hala","zewnatrz"],
+    "typ": "indywidualny"
+  },
+  {
+    "index": 1,
+    "nazwa": "Badminton",
+    "lokacja": ["hala","zewnatrz"],
+    "typ": ["indywidualny","towarzyski"]
+  },
+  {
+    "index": 2,
+    "nazwa": "Cricket",
+    "lokacja": "zewnatrz",
+    "typ": "towarzyski"
+  },
+  {
+    "index": 3,
+    "nazwa": "Bowling",
+    "lokacja": "hala",
+    "typ": ["towarzyski","indywidualny"]
+  },
+  {
+    "index": 4,
+    "nazwa": "Boxing",
+    "lokacja": "hala",
+    "typ": "indywidualny"
+  },
+  {
+    "index": 5,
+    "nazwa": "Curling",
+    "lokacja": "hala",
+    "typ": "towarzyski"
+  },
+  {
+    "index": 6,
+    "nazwa": "Tennis",
+    "lokacja": ["hala","zewnatrz"],
+    "typ": ["towarzyski","indywidualny"]
+  },
+  {
+    "index": 7,
+    "nazwa": "Skateboarding",
+    "lokacja": ["hala","zewnatrz"],
+    "typ": "indywidualny"
+  },
+  {
+    "index": 8,
+    "nazwa": "Hockey",
+    "lokacja": "hala",
+    "typ": "towarzyski"
+  },
+  {
+    "index": 9,
+    "nazwa": "Karate",
+    "lokacja": "hala",
+    "typ": "indywidualny"
+  }
+]

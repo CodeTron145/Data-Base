@@ -1,0 +1,26 @@
+1.  -db.createCollection("sport")
+    -db.createCollection("zwierzeta");
+    -db.createCollection("osoby");
+
+2.  -sports.json
+
+3.  -zwierzeta.json
+
+4.  -osoby.json
+
+5.  -show collections
+    -db.getCollectionNames().forEach(function(collection) {
+        var resultCount = db[collection].count();
+        if(resultCount>0) {
+            print(collection);
+        }
+    });
+
+6. -db.osoby.find({"pet.gatunek": "kot"},{firstName:1, "pet.gatunek": "kot", _id:0})
+
+7. db.osoby.find({firstName: "Rosa", $or [ {country1:"Spain"}, {country2:{$ne: null}}]},{firstName:1, country1:1, country2:1, _id:0})
+
+13. -db.osoby.find({"pet.gatunek": "szynszyla"},{firstName:1, surName:1, "country1.country":1, country1:1, country2:1, _id:0}).sort({age: 1})
+
+10. -db.osoby.deleteMany({ hobby : { $all: ["Hockey","Curling"]}})
+

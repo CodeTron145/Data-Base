@@ -1,0 +1,83 @@
+[
+    {
+      "index": 0,
+      "gatunek": "kot",
+      "rasa": ["balijski","nebelung","birmanski"],
+      "minWaga": "3",
+      "maxWaga": "5",
+      "gama": ["bialy","czarny","czarnobialy"],
+      "dlZycia": "15"
+    },
+    {
+      "index": 1,
+      "gatunek": "pies",
+      "minWaga": "5",
+      "maxWaga": "100",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "20"
+    },
+    {
+      "index": 2,
+      "gatunek": "chomik",
+      "minWaga": "0.05",
+      "maxWaga": "0.6",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "2"
+    },
+    {
+      "index": 3,
+      "gatunek": "papuga",
+      "minWaga": "0.1",
+      "maxWaga": "3",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "10"
+    },
+    {
+      "index": 4,
+      "gatunek": "swinia",
+      "minWaga": "20",
+      "maxWaga": "300",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "10"
+    },
+    {
+      "index": 5,
+      "gatunek": "Szczur",
+      "minWaga": "0.05",
+      "maxWaga": "0.6",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "3"
+    },
+    {
+      "index": 6,
+      "gatunek": "krolik",
+      "minWaga": "0.5",
+      "maxWaga": "4",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "5"
+    },
+    {
+      "index": 7,
+      "gatunek": "szynszyla",
+      "minWaga": "1",
+      "maxWaga": "5",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "6"
+    },
+    {
+      "index": 8,
+      "gatunek": "waz",
+      "minWaga": "0.5",
+      "maxWaga": "6",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "7"
+    },
+    {
+      "index": 9,
+      "gatunek": "zolw",
+      "minWaga": "2",
+      "maxWaga": "12",
+      "gama": ["biały", "alabastrowy","kość sloniowa","mleczny","chamois","perłowy","porcelanowy","amarantowy","arbuzowy","biskupi"],
+      "dlZycia": "30"
+    }
+]
